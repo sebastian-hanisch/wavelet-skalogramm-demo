@@ -36,7 +36,7 @@ def test_main_verdict_two_tones():
 def test_main_verdict_frequency_step():
     base = dict(signal="Frequenzsprung", p=(0.1, 0.2, 0.5))
     kind, text = ev.verdict_main(make_analysis(step=0.0, **base))
-    assert kind == "info" and text == "ω₀ = 6: Der Kamm wechselt am wahren Sprung zur zweiten Frequenz; die Kante ist bei der tieferen Frequenz etwa 23 Abtastwerte breit (2,4 s)." + LIMITS
+    assert kind == "info" and text == "ω₀ = 6: Der Kamm wechselt am wahren Sprung zur zweiten Frequenz; die Kante ist bei der tieferen Frequenz etwa 23 Abtastwerte breit (Faustwert 2,4 s)." + LIMITS
     assert "wechselt 48 Abtastwerte nach dem wahren Sprung" in ev.verdict_main(make_analysis(step=48.0, **base))[1]
     assert "wechselt 2 Abtastwerte vor dem wahren Sprung" in ev.verdict_main(make_analysis(step=-2.0, **base))[1]
     kind, text = ev.verdict_main(make_analysis(step=None, **base))
@@ -92,7 +92,7 @@ def test_verdict_cone_text():
     kind, text = ev.verdict_cone(res)
     assert kind == "info"
     assert text == ("Am Rand erreicht die Amplitude nur 0,52 des Innenwerts, bei s 0,86, bei √2 s (dem üblichen Einflusskegel) 0,93 und bei 2 s 0,98 (Theorie 0,50 / 0,84 / 0,92 / 0,98, "
-                    "in Vielfachen von s für alle ω₀ und f gleich). **Der Kegel ist kein scharfer Rand: 99 % erreicht die Amplitude erst bei 2,33 s.**")
+                    "in Vielfachen von s für alle ω₀ und f ungefähr gleich). **Der Kegel ist kein scharfer Rand: 99 % erreicht die Amplitude erst bei 2,33 s.**")
 
 
 def test_verdict_chirp_names_the_best_omega_at_the_lowest_snr():
@@ -100,7 +100,7 @@ def test_verdict_chirp_names_the_best_omega_at_the_lowest_snr():
             {"w0": 12, "snr": 0, "rmse": 0.0155, "runs": 1}, {"w0": 64, "snr": 0, "rmse": 0.0031, "runs": 1}]
     kind, text = ev.verdict_chirp(rows)
     assert kind == "info"
-    assert text == ("Bei 0 dB liegt der Kammfehler bei ω₀ = 6 bei 0,0495, bei ω₀ = 24 bei 0,0010 und bei ω₀ = 64 bei 0,0031. **Es gibt ein bestes ω₀ (hier 24), und es liegt weit über dem üblichen 6: "
+    assert text == ("Bei 0 dB liegt der Kammfehler bei ω₀ = 6 bei 0,0495, bei ω₀ = 24 bei 0,0010 und bei ω₀ = 64 bei 0,0031. **Es gibt ein bestes ω₀ (hier 24; je nach Zufallsstrom kann ein Nachbarwert knapp besser sein), und es liegt weit über dem üblichen 6: "
                     "Das Wavelet muss so lang sein, wie es das Rauschen verlangt, und so kurz, wie es die Steigung erlaubt.**")
 
 
@@ -109,4 +109,4 @@ def test_verdict_scaling_text():
     kind, text = ev.verdict_scaling(res)
     assert kind == "warning"
     assert text == ("Gleich starke Töne zeigen |W|² im Verhältnis 12 : 1 bei f = 0,025 gegen f = 0,30, mit |W|²/s überall dasselbe; weißes Rauschen ist flach. "
-                    "Eine punktweise 5-%-Schwelle trifft 4,9 % der Zellen, aber in 100 % der Läufe mindestens eine. **Die Leistung ist kein lineares Maß, und viele Zellen sind keine vielen Messungen.**")
+                    "Eine punktweise 5-%-Schwelle trifft 4,9 % der Zellen, aber in 100 % der Läufe mindestens eine. **Die Leistung ist kein lineares Maß, und eine Schwelle pro Zelle löst bei so vielen Zellen in praktisch allen Läufen aus.**")

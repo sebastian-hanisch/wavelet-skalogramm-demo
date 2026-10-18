@@ -73,7 +73,7 @@ PRESETS = {
                                                 "snr": 0, "seed": DEFAULT_SEED},
     "Zu großes ω₀: der Chirp verschmiert": {"n": 1024, "signal": "Chirp", "params": (0.1, 0.3, 0.0), "w0": 64, "fmin": 0.05, "voices": 16, "power": "gleichgewichtet", "tcut": 0.5, "fcut": 0.1, "noise": "an",
                                             "snr": 0, "seed": DEFAULT_SEED},
-    "Tiefer Ton plus Burst: nur das Skalogramm zeigt beides": {"n": 1024, "signal": "Tiefer Ton plus Burst", "params": (0.04, 0.25, 0.5), "w0": 6, "fmin": 0.02, "voices": 16, "power": "gleichgewichtet", "tcut": 0.5,
+    "Tiefer Ton plus Burst: Auflösung folgt der Frequenz": {"n": 1024, "signal": "Tiefer Ton plus Burst", "params": (0.04, 0.25, 0.5), "w0": 6, "fmin": 0.02, "voices": 16, "power": "gleichgewichtet", "tcut": 0.5,
                                                                "fcut": 0.1, "noise": "aus", "snr": 20, "seed": DEFAULT_SEED},
     "Zwei Impulse: tief gröber, hoch feiner": {"n": 1024, "signal": "Zwei Impulse", "params": (20.0, 0.5, 0.0), "w0": 6, "fmin": 0.02, "voices": 16, "power": "gleichgewichtet", "tcut": 0.5, "fcut": 0.1,
                                                "noise": "aus", "snr": 20, "seed": DEFAULT_SEED},
@@ -82,6 +82,6 @@ PRESET_HELP = {
     "Chirp mit passendem ω₀": "Linearer Chirp von 0,1 bis 0,3 bei 0 dB Rauschabstand und ω₀ = 24: Der Kamm folgt der wahren Frequenz auf etwa 0,001.",
     "Zu kleines ω₀: die Frequenz verschwimmt": "Dieselbe Messung mit ω₀ = 6, dem üblichen Wert: Das Wavelet hat nur wenige Perioden, die Frequenzauflösung ist grob und das Rauschen stört; der Kammfehler liegt mehr als das Fünfzehnfache über dem des ersten Beispiels.",
     "Zu großes ω₀: der Chirp verschmiert": "Dieselbe Messung mit ω₀ = 64: Das Wavelet ist so lang (s = 102 bei f = 0,1), dass sich die Frequenz innerhalb seiner Länge mehrfach um die Bandbreite ändert; der Gipfel wird breit, der Kammfehler steigt wieder auf das Doppelte, und nur noch 68 % der Zeit liegen außerhalb der Einflusskegel.",
-    "Tiefer Ton plus Burst: nur das Skalogramm zeigt beides": "Ein tiefer Ton bei 0,04 und ein kurzer Burst bei 0,25: Das Wavelet ist bei hoher Frequenz kurz und bei tiefer lang; zur Burstzeit zeigt das Profil beide Gipfel (bei 0,040 und 0,253).",
+    "Tiefer Ton plus Burst: Auflösung folgt der Frequenz": "Ein tiefer Ton bei 0,04 und ein kurzer Burst bei 0,25: Das Wavelet ist bei hoher Frequenz kurz und bei tiefer lang (tiefer Ton fein in der Frequenz, Burst fein in der Zeit); zur Burstzeit zeigt das Profil beide Gipfel (bei 0,040 und 0,253).",
     "Zwei Impulse: tief gröber, hoch feiner": "Zwei Impulse im Abstand 20: Bei der Frequenz 0,1 (s = 9,5) verschwimmen sie zu einem Gipfel; der Zeitverlauf bei 0,3 trennt sie. Wählen Sie unter „Frequenz des Zeitverlaufs“ den Wert 0,3.",
 }

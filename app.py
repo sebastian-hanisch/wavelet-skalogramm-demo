@@ -55,7 +55,7 @@ st.title("🌊 Kontinuierliche Wavelets: gleiche Zahl von Perioden statt gleiche
 st.markdown(
     """
 Das Spektrogramm schneidet das Signal in Fenster **fester Länge** $L$: Es trennt Frequenzen überall gleich fein und Zeitpunkte überall gleich fein. Die **Wavelet-Transformation** dehnt dagegen ein Wellenpaket
-mit der Skala $s$: Das Morlet-Wavelet $\\psi(t) = \\pi^{-1/4} e^{i\\omega_0 t} e^{-t^2/2}$ hat immer dieselbe Zahl von Perioden ($\\omega_0$), seine Länge wächst mit $s = \\omega_0 / (2\\pi f)$.
+mit der Skala $s$: Das Morlet-Wavelet $\\psi(t) = \\pi^{-1/4} e^{i\\omega_0 t} e^{-t^2/2}$ hat immer dieselbe Zahl von Perioden (etwa $\\omega_0$ innerhalb von $\\pm 3\\,s$), seine Länge wächst mit $s = \\omega_0 / (2\\pi f)$.
 Tiefe Frequenzen sehen daher ein langes, hohe ein kurzes Wavelet: Die Frequenzauflösung ist proportional zur Frequenz, die Zeitauflösung umgekehrt. Das Skalogramm ist die Leistung $|W(s, t)|^2$ über Zeit und Frequenz;
 der Parameter $\\omega_0$ regelt, wie viel Frequenzschärfe man gegen Zeitschärfe tauscht.
 
@@ -67,10 +67,10 @@ und Impulse sind bekannt. Weiter unten: **🔬 Experimente**, **🚧 Wo die Anna
 with st.expander("So entsteht das Skalogramm", expanded=True):
     st.markdown(
         """
-1. **Wavelet dehnen:** Zu jeder Frequenz $f$ gehört die Skala $s = \\omega_0 / (2\\pi f)$; das Wavelet hat dort $\\omega_0$ Perioden in einer Gaußhülle der Breite $s$.
+1. **Wavelet dehnen:** Zu jeder Frequenz $f$ gehört die Skala $s = \\omega_0 / (2\\pi f)$; das Wavelet hat dort etwa $\\omega_0$ Perioden (innerhalb von $\\pm 3\\,s$) in einer Gaußhülle der Breite $s$.
 2. **Falten:** $W(s, n)$ ist die Faltung des Signals mit dem gedehnten Wavelet (hier über die FFT, Nullen am Rand).
 3. **Leistung:** Dargestellt wird $|W|^2 / s$ (gleichgewichtet: jede Linie der Amplitude 1 gibt dieselbe Spitze) oder $|W|^2$; in dB gegen das Maximum, bei $-60$ dB abgeschnitten.
-4. **Grenzen:** Zwei Töne trennt das Wavelet ab dem Frequenzverhältnis $1 + 3{,}9 / \\omega_0$, zwei Impulse sicher ab etwa $2{,}4\\,s$; am Rand zeigt der **Einflusskegel**, wo die Werte unsicher werden.
+4. **Grenzen:** Zwei Töne trennt das Wavelet ab dem Frequenzverhältnis $1 + 3{,}9 / \\omega_0$, zwei Impulse sicher ab etwa $2{,}4\\,s$ (Faustwerte mit etwa 15 % Spielraum, keine Formeln); am Rand zeigt der **Einflusskegel**, wo die Werte unsicher werden.
         """
     )
 
@@ -100,8 +100,8 @@ with st.sidebar:
     while len(values) < 3:
         values.append(0.0)
     st.markdown("**Wavelet und Gitter**")
-    w0 = st.select_slider("ω₀ (Perioden im Wavelet)", options=list(C.W0_CHOICES), key="w0_select",
-                          help="Zahl der Perioden unter der Gaußhülle. Mehr: schärfer in der Frequenz, gröber in der Zeit. Üblich: 6. Die Frequenzachse endet bei f_max = ω₀ / (2 (ω₀ + 3,7)), höchstens 0,45.")
+    w0 = st.select_slider("ω₀ (etwa so viele Perioden im Wavelet)", options=list(C.W0_CHOICES), key="w0_select",
+                          help="Etwa so viele Perioden unter der Gaußhülle (innerhalb von ±3 Hüllenbreiten). Mehr: schärfer in der Frequenz, gröber in der Zeit. Üblich: 6. Die Frequenzachse endet bei f_max = ω₀ / (2 (ω₀ + 3,7)), höchstens 0,45.")
     fmin = st.select_slider("kleinste Frequenz", options=list(C.FMIN_CHOICES), key="fmin_select", help="Untere Grenze der Frequenzachse; tiefe Frequenzen brauchen lange Wavelets.")
     voices = st.select_slider("Stimmen je Oktave", options=list(C.VOICES_CHOICES), key="voices_select", help="Dichte des logarithmischen Frequenzgitters.")
     power = st.radio("Leistung", list(C.POWER_MODES), key="power_select", horizontal=True,
@@ -147,7 +147,7 @@ else:
 m2.metric("Trenngrenze Frequenz", f"Verhältnis {de(a.ratio_limit, 2)}", delta=f"1 + {de(C.FREQ_RULE_K, 1)} / ω₀ (Faustregel)", delta_color="off",
           help="Zwei gleich starke Töne werden ab diesem Verhältnis der Frequenzen getrennt, bei jeder Frequenz gleich (Experiment unten).")
 m3.metric("Trenngrenze Zeit", f"{de(a.time_limit, 0)} Abtastwerte", delta=f"{de(C.TIME_RULE_K, 1)} s bei f = {de(settings.fcut, 3)}", delta_color="off",
-          help="Zwei Impulse werden bei der Frequenz des Zeitverlaufs ab etwa 2,4 s sicher getrennt; s = ω₀ / (2π f).")
+          help="Zwei Impulse werden bei der Frequenz des Zeitverlaufs ab etwa 2,4 s getrennt (Faustwert mit etwa 15 % Spielraum; bei ω₀ ab 8 liegt die sichere Grenze eher darüber); s = ω₀ / (2π f).")
 m4.metric("Zellen", f"{a.cells}", delta=f"gültig bis f = {de(a.fmax, 2)}", delta_color="off", help="Frequenzen mal Zeitpunkte; benachbarte Zellen sind stark korreliert. Das abgetastete Wavelet ist nur bis f_max unverfälscht.")
 st.plotly_chart(build_signal(a), width="stretch", key="signal")
 st.plotly_chart(build_scalogram(a), width="stretch", key="scalogram")
@@ -249,7 +249,7 @@ st.markdown(
 | **Die Werte am Rand stimmen** | Im Einflusskegel fehlt ein Teil des Wavelets; die Amplitude erreicht 99 % erst bei 2,3 s Abstand vom Rand. | Randwerte verwerfen, Spiegeln (nicht gebaut) |
 | **Das abgetastete Wavelet ist unverfälscht** | Oberhalb von f_max (bei ω₀ = 6: 0,31) weicht die FFT-Transformation von der Summendefinition ab (bei f = 0,4 und ω₀ = 6 um mehr als 5 %); die Frequenzachse endet bei f_max. | größeres ω₀, Überabtastung |
 | **Die Leistung ist ein Maß für die Stärke** | \\|W\\|² wächst mit s; erst \\|W\\|²/s macht gleich starke Linien gleich hoch. Das Skalogramm ist kein lineares Leistungsspektrum. | Gleichgewichtung |
-| **Zellen sind unabhängig** | Benachbarte Zellen sind stark korreliert (0,58 bei Abstand s, 0,85 bei 10 % Frequenzunterschied); eine Schwelle pro Zelle trifft irgendwo fast immer. | Mehrfachtests, Wavelet-Kohärenz |
+| **Zellen sind unabhängig** | Benachbarte Zellen sind stark korreliert (0,58 bei Abstand s, 0,85 bei 10 % Frequenzunterschied); eine Schwelle pro Zelle löst bei so vielen Zellen in praktisch allen Läufen irgendwo aus. | Mehrfachtests, Wavelet-Kohärenz |
 | **Nur ein Wavelet** | Hier nur das analytische Morlet-Wavelet; reelle Wavelets (Mexikanerhut) und andere Familien verhalten sich anders. | nicht gebaut |
 """,
 )
@@ -266,7 +266,7 @@ umgesetzt über die FFT mit $\hat\psi(s\omega) = \pi^{-1/4} \sqrt{2\pi s}\, e^{-
 in der Spitze.
 
 **Auflösung.** Die Gaußkurve im Frequenzbereich hat die relative Breite $1/\omega_0$: Zwei Töne trennt das Wavelet bei einem festen Frequenzverhältnis (gemessen etwa $1 + 3{,}9/\omega_0$), unabhängig von $f$. Im Zeitbereich ist die Hülle $e^{-t^2/(2s^2)}$
-breit wie $s$; zwei Impulse sind sicher ab etwa $2{,}4\,s$ getrennt.
+breit wie $s$; zwei Impulse sind sicher ab etwa $2{,}2$ bis $2{,}8\,s$ getrennt (Faustwert $2{,}4\,s$).
 
 **Einflusskegel.** Bei Nullen am Rand ist die Amplitude eines Tons im Abstand $d$ vom Rand $\Phi(d/s)$ mal der Innenwert ($\Phi$ die Verteilungsfunktion der Normalverteilung); die e-Falte $\sqrt 2\, s$ lässt 8 % der Amplitude fehlen.
 

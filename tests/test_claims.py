@@ -51,7 +51,7 @@ def test_preset_small_w0_is_over_fifteen_times_worse_and_large_w0_about_twice():
 
 
 def test_preset_burst_shows_both_peaks_near_forty_thousandths_and_a_quarter():
-    name = "Tiefer Ton plus Burst: nur das Skalogramm zeigt beides"
+    name = "Tiefer Ton plus Burst: Auflösung folgt der Frequenz"
     a = A(name)
     assert a.both_found is True and de(a.burst_peaks[0], 3) == "0,040" and de(a.burst_peaks[1], 3) == "0,253"
     assert "Burst bei 0,25" in C.PRESET_HELP[name] and "ton bei 0,04".lower() in C.PRESET_HELP[name].lower() and "0,040 und 0,253" in C.PRESET_HELP[name]
@@ -78,6 +78,8 @@ def test_resolution_numbers_in_the_readme_and_the_app():
     assert rows[0.025]["first"] == 19 and "19 Abtastwerte bei f = 0,025 gegen 90 sicher" in README
     cross = res["stft_width"] / (rows[0.1]["ratio"] - 1)
     assert round(cross, 2) == 0.06 and "f ≈ 0,06" in README and "etwa 0,06" in APP
+    cross_time = C.TIME_RULE_K * 6 / (2 * math.pi * res["stft_distance"])        # Wavelet 2,4 s gleich 33 Abtastwerte des Spektrogramms
+    assert 0.065 < cross_time < 0.07 and "f ≈ 0,06 bis 0,07 (ω₀ = 6, L = 64)" in README
     for f in (0.1, 0.2):
         assert (rows[f]["stft_ratio"] - 1) * f == pytest.approx(res["stft_width"], abs=0.003)
 
@@ -90,6 +92,8 @@ def test_omega_numbers_and_the_rules_of_thumb():
     assert round(min(k), 1) == 3.2 and round(max(k), 1) == 4.8 and "zwischen 3,2 und 4,8" in README and min(k) <= C.FREQ_RULE_K <= max(k) and C.FREQ_RULE_K == 3.9
     t = [rows[w]["robust"] / rows[w]["s"] for w in rows]
     assert round(min(t), 1) == 2.2 and round(max(t), 1) == 2.8 and "zwischen 2,2 und 2,8 s" in README and "1 + 3,9" in README and "1 + 3{,}9" in APP
+    assert 2.5 < sum(t) / len(t) < 2.7 and "im Mittel etwa 2,5 s" in README                                 # Mittel über die ω₀-Reihe 2,61, über beide Reihen 2,55
+    assert all(rows[w]["robust"] > C.TIME_RULE_K * rows[w]["s"] for w in (8, 10, 12, 16)) and "für ω₀ ab 8 liegt der gemessene sichere Impulsabstand über 2,4 s" in README
 
 
 def test_cone_numbers_in_the_readme_and_the_app():
@@ -99,7 +103,7 @@ def test_cone_numbers_in_the_readme_and_the_app():
     first = cone["rows"][0]
     assert [de(first[k], 2) for k in ("r0", "r1", "r_coi", "r2")] == ["0,52", "0,86", "0,93", "0,98"] and "0,52 des Innenwerts, bei s 0,86, bei √2 s (dem üblichen Einflusskegel) 0,93 und bei 2 s 0,98" in README
     for r in cone["rows"]:
-        assert abs(r["r1"] - th["r1"]) < 0.05 and abs(r["r_coi"] - th["r_coi"]) < 0.03 and abs(r["r2"] - th["r2"]) < 0.015
+        assert abs(r["r0"] - th["r0"]) <= 0.07 and abs(r["r1"] - th["r1"]) < 0.05 and abs(r["r_coi"] - th["r_coi"]) < 0.03 and abs(r["r2"] - th["r2"]) < 0.015
         assert de(r["d90"] / r["s"], 2) in ("1,26", "1,25") and de(r["d99"] / r["s"], 2) in ("2,30", "2,31")
     assert de(th["d90"], 2) == "1,28" and de(th["d99"], 2) == "2,33" and "ab 1,26 s, 99 % ab 2,30 s" in README and "2,3 s" in APP
     assert round(100 * (1 - th["r_coi"])) == 8 and "8 % der Amplitude" in APP
@@ -112,6 +116,7 @@ def test_chirp_best_w0_is_24_at_noise_and_the_table_numbers():
     rows = {(r["w0"], r["snr"]): r["rmse"] for r in get("chirp")}
     for snr in (0, 10):
         assert min(C.EXP_CHIRP_W0, key=lambda w: rows[(w, snr)]) == 24
+    assert sorted(C.EXP_CHIRP_W0, key=lambda w: rows[(w, 0)])[:2] == [24, 32] and "bei 24 bis 32 (bei 10 dB eindeutig 24)" in README
     assert min(C.EXP_CHIRP_W0, key=lambda w: rows[(w, 60)]) == 6 and rows[(64, 60)] > rows[(6, 60)] and "bei 60 dB steigt der Fehler" in README
     for snr, line in ((0, "0,0495 / 0,0368 / 0,0155 / 0,0023 / 0,0010 / 0,0011 / 0,0020 / 0,0031"), (10, "0,0021 / 0,0014 / 0,0007 / 0,0005 / 0,0003 / 0,0004 / 0,0007 / 0,0013")):
         assert " / ".join(de(rows[(w, snr)]) for w in C.EXP_CHIRP_W0) == line and line in README

@@ -289,7 +289,7 @@ def verdict_main(a: Analysis) -> tuple[str, str]:
             return "warning", head + "Der Kamm erreicht die zweite Frequenz nie." + _limits(a)
         width = C.TIME_RULE_K * float(M.scale_of(min(s.p1, s.p2), s.w0))
         where = "am wahren Sprung" if a.step_error == 0 else f"{de(abs(a.step_error), 0)} Abtastwerte {'nach' if a.step_error > 0 else 'vor'} dem wahren Sprung"
-        return "info", head + f"Der Kamm wechselt {where} zur zweiten Frequenz; die Kante ist bei der tieferen Frequenz etwa {de(width, 0)} Abtastwerte breit (2,4 s)." + _limits(a)
+        return "info", head + f"Der Kamm wechselt {where} zur zweiten Frequenz; die Kante ist bei der tieferen Frequenz etwa {de(width, 0)} Abtastwerte breit (Faustwert 2,4 s)." + _limits(a)
     if s.signal == "Zwei Impulse":
         dt = int(round(a.signal.events[1] - a.signal.events[0]))
         if a.resolved is None:
@@ -322,7 +322,7 @@ def verdict_cone(res: dict) -> tuple[str, str]:
     rows, th = res["rows"], res["theory"]
     r = rows[0]
     return "info", (f"Am Rand erreicht die Amplitude nur {de(r['r0'], 2)} des Innenwerts, bei s {de(r['r1'], 2)}, bei √2 s (dem üblichen Einflusskegel) {de(r['r_coi'], 2)} und bei 2 s {de(r['r2'], 2)} (Theorie "
-                    f"{de(th['r0'], 2)} / {de(th['r1'], 2)} / {de(th['r_coi'], 2)} / {de(th['r2'], 2)}, in Vielfachen von s für alle ω₀ und f gleich). **Der Kegel ist kein scharfer Rand: 99 % erreicht die Amplitude erst bei {de(th['d99'], 2)} s.**")
+                    f"{de(th['r0'], 2)} / {de(th['r1'], 2)} / {de(th['r_coi'], 2)} / {de(th['r2'], 2)}, in Vielfachen von s für alle ω₀ und f ungefähr gleich). **Der Kegel ist kein scharfer Rand: 99 % erreicht die Amplitude erst bei {de(th['d99'], 2)} s.**")
 
 
 def verdict_chirp(rows: list[dict]) -> tuple[str, str]:
@@ -331,7 +331,7 @@ def verdict_chirp(rows: list[dict]) -> tuple[str, str]:
     best = min(sub, key=lambda r: r["rmse"])
     first, last = sub[0], sub[-1]
     return "info", (f"Bei {snr} dB liegt der Kammfehler bei ω₀ = {first['w0']} bei {de(first['rmse'], 4)}, bei ω₀ = {best['w0']} bei {de(best['rmse'], 4)} und bei ω₀ = {last['w0']} bei {de(last['rmse'], 4)}. "
-                    f"**Es gibt ein bestes ω₀ (hier {best['w0']}), und es liegt weit über dem üblichen 6: Das Wavelet muss so lang sein, wie es das Rauschen verlangt, und so kurz, wie es die Steigung erlaubt.**")
+                    f"**Es gibt ein bestes ω₀ (hier {best['w0']}; je nach Zufallsstrom kann ein Nachbarwert knapp besser sein), und es liegt weit über dem üblichen 6: Das Wavelet muss so lang sein, wie es das Rauschen verlangt, und so kurz, wie es die Steigung erlaubt.**")
 
 
 def verdict_scaling(res: dict) -> tuple[str, str]:
@@ -339,4 +339,4 @@ def verdict_scaling(res: dict) -> tuple[str, str]:
     last = tones[-1]
     return "warning", (f"Gleich starke Töne zeigen |W|² im Verhältnis {de(last['rel_l2'], 0)} : 1 bei f = {de(last['f'], 3)} gegen f = {de(tones[0]['f'], 2)}, mit |W|²/s überall dasselbe; weißes Rauschen ist flach. "
                        f"Eine punktweise 5-%-Schwelle trifft {de(100 * alarm['cells_share'], 1)} % der Zellen, aber in {de(100 * alarm['runs_share'], 0)} % der Läufe mindestens eine. **Die Leistung ist kein lineares Maß, "
-                       f"und viele Zellen sind keine vielen Messungen.**")
+                       f"und eine Schwelle pro Zelle löst bei so vielen Zellen in praktisch allen Läufen aus.**")
